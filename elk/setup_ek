@@ -1,0 +1,33 @@
+docker network create --driver=overlay --attachable esnet
+
+docker run --network esnet docker.elastic.co/beats/metricbeat:7.2.0 setup -E setup.kibana.host=kibana:5601 -E output.elasticsearch.hosts=["elasticsearch:9200"]
+docker run --network esnet docker.elastic.co/beats/filebeat:7.2.0 setup -E setup.kibana.host=kibana:5601 -E output.elasticsearch.hosts=["elasticsearch:9200"]
+
+Examples:
+=========
+
+docker run \
+--label co.elastic.logs/module=apache2 \
+--label co.elastic.logs/fileset.stdout=access \
+--label co.elastic.logs/fileset.stderr=error \
+--label co.elastic.metrics/module=apache \
+--label co.elastic.metrics/metricsets=status \
+--label co.elastic.metrics/hosts='${data.host}:${data.port}' \
+--network esnet \
+--detach=true \
+--name my-apache-app \
+-p 8080:80 \
+httpd:2.4
+
+docker run \
+--label co.elastic.logs/module=apache2 \
+--label co.elastic.logs/fileset.stdout=access \
+--label co.elastic.logs/fileset.stderr=error \
+--label co.elastic.metrics/module=apache \
+--label co.elastic.metrics/metricsets=status \
+--label co.elastic.metrics/hosts='${data.host}:${data.port}' \
+--network=esnet \
+--detach=true \
+--name my-apache-app \
+-p 8080:80 \
+httpd:2.4
